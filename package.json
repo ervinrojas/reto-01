@@ -1,0 +1,29 @@
+{
+  "name": "reto-01",
+  "module": "index.ts",
+  "type": "module",
+  "private": true,
+  "devDependencies": {
+    "@types/bun": "^1.4.2"
+  },
+  "peerDependencies": {
+    "typescript": "^7"
+  },
+  "dependencies": {
+    "@ai-sdk/openai": "^4.0.74",
+    "ai": "^7.0.113",
+    "exceljs": "^4.4.0",
+    "hono": "^4.13.9",
+    "tsx": "^4.23.15",
+    "zod": "^4.6.5"
+  },
+  "version": "1.0.0",
+  "description": "To install dependencies:",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
