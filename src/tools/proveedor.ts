@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { resolve } from "path";
-import { Workbook } from "exceljs"; 
-import { promises as fs } from "fs"; // <--- ESTA LÍNEA FALTA
+import * as ExcelJS from "exceljs";
+import { promises as fs } from "fs"; 
 
 // Helper rápido para leer JSON con Bun
 async function readJson(path: string) {
@@ -92,7 +92,7 @@ export const generar_formulario = {
       const basePath = resolve(ctx.directory, "fixtures/reto-01/casos", args.caso);
       const plantilla = await readJson(`${basePath}/plantilla-celdas.json`);
 
-      const workbook = new Workbook();
+      const workbook = new ExcelJS.Workbook();
       const worksheet = workbook.addWorksheet("Formulario");
 
       // Escribir campos llenos
