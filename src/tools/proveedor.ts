@@ -169,3 +169,26 @@ export const armar_paquete = {
     }
   }
 };
+
+// 5. SIMULAR ENVIO
+export const simular_envio = {
+  description: "Simula el envío del paquete al cliente. Requiere confirmación explícita.",
+  args: { 
+    caso: z.string(),
+    confirmado: z.boolean().describe("Debe ser true para confirmar el envío")
+  },
+  async execute(args: { caso: string, confirmado: boolean }, ctx: { directory: string }) {
+    if (!args.confirmado) {
+      return JSON.stringify({ ok: false, error: "Requiere confirmación explícita del usuario para enviar." });
+    }
+    
+    try {
+      const outDir = resolve(ctx.directory, "out", args.caso);
+      await fs.mkdir(outDir, { recursive: true });
+      await fs.writeFile(resolve(outDir, "ENVIO-SIMULADO.md"), `Envío simulado para ${args.caso} el ${new Date().toISOString()}`);
+      return JSON.stringify({ ok: true, data: { mensaje: "Paquete enviado (simulado) exitosamente." } });
+    } catch (e: any) {
+      return JSON.stringify({ ok: false, error: e.message });
+    }
+  }
+};

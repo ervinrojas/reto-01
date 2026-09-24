@@ -62,7 +62,7 @@ app.post("/api/chat", async (c) => {
       system: promptText,
       tools: aiTools,
       prompt: message,
-      maxSteps: 5,
+      maxSteps: 10,
     });
 
     let reply = result.text;

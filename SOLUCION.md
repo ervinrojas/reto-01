@@ -1,31 +1,36 @@
-Solución Reto 01
-1. Problema
-Transcripción manual de datos de maestros a formularios de clientes, generando retrabajo y riesgo de error en datos sensibles.
+Solución Reto 01 — Agente Conversacional "Registro como Proveedor"
+1. Problema en una frase
+Transcripción manual y repetitiva de datos maestros a formularios de clientes, generando errores y dependencia de una persona.
 
 2. Arquitectura
-Herramientas (Core): src/tools/proveedor.ts - Lógica pura en TypeScript para leer, mapear, generar y armar.
-Agente/LLM: src/server.ts - Ciclo de agente usando Vercel AI SDK y OpenAI (gpt-4o-mini).
-Frontend: web/index.html - Chat vanilla JS.
-Demo: demo.ts - Ejecución directa de herramientas sin LLM.
+Front (Vanilla HTML/JS) → Backend (Hono/Bun) → Vercel AI SDK → OpenAI (gpt-4o-mini) → Herramientas (TS/Zod) → File System (Fixtures/Out).
+
 3. Ciclo del agente
-Usé Vercel AI SDK (generateText) con maxSteps: 5. El LLM decide llamar herramientas en orden: Leer -> Mapear -> Generar -> Armar.
+Implementado con generateText de Vercel AI SDK. El modelo decide qué herramienta llamar basado en el prompt. Límite de iteraciones (maxSteps=10) para evitar loops. Confirmación humana implementada en herramienta simular_envio.
 
 4. Elección del modelo
-OpenAI gpt-4o-mini: Rápido, barato y excelente siguiendo instrucciones de herramientas (function calling).
+gpt-4o-mini: Rápido, barato ($0.15/1M tokens input) y excelente siguiendo instrucciones de function calling.
 
-5. Decisiones y trade-offs
-ExcelJS vs Copia de plantilla: Elegí generar el Excel desde 0 con ExcelJS basado en plantilla-celdas.json en lugar de manipular un archivo binario existente para garantizar el control de las celdas.
-PDF (P1): Omitido por tiempo. Se asume que se generaría un PDF simple o un markdown con los campos.
-Frontend Vanilla: No usé React para evitar tiempos de build y asegurarme de levantar en 1 segundo.
-6. Supuestos
-Los fixtures representan la realidad.
-El glosario cubre el 100% de las variaciones de campos de los clientes actuales.
-7. Cobertura
-HU	Estado	Notas
-HU-1 Leer	Hecho	leer_solicitud funcional
-HU-2 Mapear	Hecho	mapear_campos funcional con glosario y reglas país
-HU-3 Generar	Parcial	Excel (P0) hecho. PDF (P1) pendiente.
-HU-4 Paquete	Hecho	armar_paquete copia soportes y evalúa vigencias
-HU-5 Errores	Hecho	Herramientas devuelven { ok: false, error }
-8. Uso de IA
-Usé ChatGPT/Copilot para generar boilerplate de Hono y Zod schemas.
+5. Diseño del portal web (Sección 7.4)
+Para portales web con login, se usaría Playwright o Puppeteer controlado por el agente. El agente se encargaría de navegar y llenar campos, pero el ingreso de credenciales y el clic final de "Enviar" quedan en manos humanas por seguridad (CAPTCHA/MFA). Las credenciales vivirían en un vault (Azure Key Vault) inyectado por variable de entorno, jamás en el prompt.
+
+6. Decisiones y trade-offs
+ExcelJS vs Manipulación binaria: Generé el Excel desde 0 basado en plantilla-celdas.json en lugar de modificar un template existente. Alternativa descartada: Librerías que modifican buffers de Excel son frágiles ante cambios de formato.
+Frontend Vanilla vs React: Elegí HTML plano para cumplir el requisito de "arranque < 2 mins" sin configuración de build. Alternativa descartada: Next.js (demasiado overhead para un agente de consola).
+Mapeo por glosario vs IA semántica: Uso un JSON de sinónimos estático (glosario-campos.json) en lugar de pedirle al LLM que adivine el mapeo. Alternativa descartada: Mapeo por embeddings (más flexible pero propenso a alucinaciones en datos críticos).
+7. Supuestos
+El glosario cubre el 100% de las variaciones de campos actuales.
+Los soportes en el repositorio están actualizados (la vigencia se calcula al momento de armar el paquete).
+8. Cobertura
+HU	Estado	Qué falta para producción
+HU-1 Leer	Hecho	-
+HU-2 Mapear	Hecho	Soportar variaciones de países no listados
+HU-3 Generar	Parcial	Falta PDF (P1), solo se implementó Excel (P0)
+HU-4 Paquete	Hecho	Integración real con SharePoint
+HU-5 Errores	Hecho	Logging más estructurado
+9. Uso de IA
+Usé ChatGPT (GPT-4) para generar boilerplate de Hono server y los esquemas Zod. Descarté sugerencias de usar LangChain porque Vercel AI SDK es más ligero y tipado para Bun.
+
+10. Riesgos
+Plantillas no mapeadas: Clientes nuevos con formatos raros romperán el mapeo. Mitigación: Reporte de faltantes explícito.
+Soportes vencidos: El proceso se bloquea si algo venció. Mitigación: Alertas proactivas semanales.
