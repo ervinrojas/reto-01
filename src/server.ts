@@ -67,13 +67,8 @@ app.post("/api/chat", async (c) => {
 
     let reply = result.text;
     
-    if (!reply && result.toolResults && result.toolResults.length > 0) {
-      reply = "🛠️ Resultados de herramientas:\n\n" + 
-              result.toolResults.map((tr: any) => JSON.stringify(tr.result, null, 2)).join("\n\n");
-    }
-    
     if (!reply) {
-      reply = "El agente procesó la solicitud pero no generó respuesta.";
+      reply = "🛠️ Resultados completos del Agente:\n\n" + JSON.stringify(result, null, 2);
     }
 
     console.log("✅ OpenAI respondió!");
