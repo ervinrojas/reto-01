@@ -2,12 +2,12 @@
   "compilerOptions": {
     "target": "ES2021",
     "module": "commonjs",
+    "moduleResolution": "node",
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
-    "resolveJsonModule": true,
-    "types": ["node"]
+    "resolveJsonModule": true
   },
   "include": ["src/**/*", "demo.ts"],
   "exclude": ["node_modules", "out", "web"]
